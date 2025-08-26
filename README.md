@@ -1,97 +1,139 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# OneTrust POC - Simplified Testing
 
-# Getting Started
+This project demonstrates a simplified OneTrust implementation for React Native, focusing on core consent management functionality using OneTrust's default UI components.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Quick Start
 
-## Step 1: Start Metro
+### Prerequisites
+- React Native project with OneTrust SDK installed
+- OneTrust account with test domain and app ID
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+### Installation
+```bash
+npm install react-native-onetrust-cmp
+# or
+yarn add react-native-onetrust-cmp
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+### Configuration
+Update `src/config/OneTrustConfig.ts` with your OneTrust credentials:
+```typescript
+export const OneTrustConfig = {
+  domainId: 'https://cdn.cookielaw.org/consent/YOUR_DOMAIN_ID',
+  appId: 'YOUR_APP_ID',
+  region: 'EU', // or 'US', 'APAC'
+  language: 'en',
+  categories: {
+    necessary: 'C0001',
+    analytics: 'C0002',
+    marketing: 'C0003',
+    preferences: 'C0004',
+  }
+};
 ```
 
-### iOS
+## 🧪 Testing OneTrust
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### Basic Usage
+```typescript
+import OneTrustService from './src/services/OneTrustService';
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+const oneTrust = OneTrustService.getInstance();
 
-```sh
-bundle install
+// Initialize OneTrust
+await oneTrust.initialize();
+
+// Check consent status
+const isRequired = await oneTrust.isConsentRequired();
+const hasConsent = await oneTrust.hasConsent();
+
+// Get consent preferences
+const preferences = await oneTrust.getConsentPreferences();
+
+// Show OneTrust's default consent banner
+await oneTrust.showConsentBanner();
+
+// Show OneTrust's default preferences screen
+await oneTrust.showConsentPreferences();
+
+// Update preferences
+await oneTrust.updateConsentPreferences({
+  necessary: true,
+  analytics: true,
+  marketing: false,
+  preferences: true
+});
 ```
 
-Then, and every time you update your native dependencies, run:
+## 📱 Core Features
 
-```sh
-bundle exec pod install
+- **SDK Initialization**: Simple OneTrust SDK setup
+- **Consent Management**: Check, update, and reset consent preferences
+- **Default UI Components**: Use OneTrust's built-in consent banner and preferences screen
+- **Category Support**: Handle different cookie categories (necessary, analytics, marketing, preferences)
+
+## 🔧 API Reference
+
+### OneTrustService Methods
+
+| Method | Description |
+|--------|-------------|
+| `initialize()` | Initialize OneTrust SDK |
+| `isConsentRequired()` | Check if consent is required |
+| `hasConsent()` | Check if user has provided consent |
+| `getConsentPreferences()` | Get current consent preferences |
+| `updateConsentPreferences()` | Update consent preferences |
+| `showConsentBanner()` | Show OneTrust's default consent banner |
+| `showConsentPreferences()` | Show OneTrust's default preferences screen |
+| `resetConsent()` | Reset all consent preferences |
+| `getConsentStatus()` | Get comprehensive consent status |
+
+### Consent Preferences Interface
+```typescript
+interface ConsentPreferences {
+  necessary: boolean;    // Always true
+  analytics: boolean;    // Analytics cookies
+  marketing: boolean;    // Marketing cookies
+  preferences: boolean;  // Preference cookies
+}
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 🎯 Testing Scenarios
 
-```sh
-# Using npm
-npm run ios
+1. **Basic Initialization**: Test SDK setup and configuration
+2. **Consent Flow**: Test OneTrust's default banner display and user consent
+3. **Preferences Management**: Test updating and retrieving consent preferences
+4. **Reset Functionality**: Test consent reset and cleanup
+5. **Error Handling**: Test behavior when OneTrust is unavailable
 
-# OR using Yarn
-yarn ios
+## 🎨 UI Components
+
+This implementation uses OneTrust's default UI components:
+- **Consent Banner**: `showConsentBanner()` displays OneTrust's standard consent banner
+- **Preferences Screen**: `showConsentPreferences()` shows OneTrust's preferences management interface
+
+No custom UI components are included, ensuring consistency with OneTrust's design and compliance standards.
+
+## 🚨 Troubleshooting
+
+### Common Issues
+- **Module not found**: Ensure `react-native-onetrust-cmp` is properly installed
+- **Initialization failed**: Check OneTrust credentials and network connectivity
+- **Categories not found**: Verify category IDs in OneTrust configuration
+
+### Debug Mode
+Enable OneTrust logging:
+```typescript
+// Log levels: 0=Error, 1=Warning, 2=Info, 3=Debug
+OTPublishersNativeSDK.enableOTSDKLog(3);
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 📚 Additional Resources
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+- [OneTrust Developer Documentation](https://developer.onetrust.com/)
+- [React Native OneTrust CMP](https://github.com/OneTrust/OneTrust-CMP-React-Native)
+- [Cookie Consent Best Practices](https://www.onetrust.com/blog/cookie-consent-best-practices/)
 
-## Step 3: Modify your app
+## 🤝 Contributing
 
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+This is a simplified implementation for testing purposes. For production use, refer to official OneTrust documentation and implement proper error handling and compliance features.
